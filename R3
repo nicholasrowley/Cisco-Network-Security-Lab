@@ -1,0 +1,386 @@
+Current configuration : 11585 bytes
+!
+! Last configuration change at 15:38:08 NZST Mon Apr 8 2019 by BuzzAdmin1
+! NVRAM config last updated at 17:53:52 NZST Mon Apr 8 2019 by BuzzAdmin2
+!
+version 15.6
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+security authentication failure rate 5 log
+security passwords min-length 10
+logging buffered 524288 errors
+logging console critical
+enable secret 9 $9$Le.a3B0Cdg4Eab$RcXznBxvLs2SUbnFZN1jp4qRHWE3Vom9uWjit6P/QGk
+!
+aaa new-model
+!
+!
+aaa authentication login AAALIST group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+!
+!
+!
+!
+!
+aaa session-id common
+ethernet lmi ce
+!
+!
+!
+no process cpu autoprofile hog
+clock timezone NZST 12 0
+clock summer-time NZDT recurring last Sun Sep 2:00 1 Sun Apr 3:00
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+no ip source-route
+no ip icmp rate-limit unreachable
+!
+!
+!
+ip dhcp excluded-address 192.168.2.1 192.168.2.5
+ip dhcp excluded-address 192.168.2.33 192.168.2.37
+!
+ip dhcp pool SITE-2-MANAGEMENT
+ network 192.168.2.0 255.255.255.224
+ domain-name buzz.co.nz
+ default-router 192.168.2.1
+!
+ip dhcp pool SITE-2-VLAN2
+ network 192.168.2.32 255.255.255.224
+ domain-name buzz.co.nz
+ default-router 192.168.2.33
+!
+ip dhcp pool PC3-RESERVED
+ host 192.168.2.34 255.255.255.224
+ client-identifier 0100.0c29.8876.20
+ domain-name buzz.co.nz
+ default-router 192.168.2.33
+!
+!
+!
+no ip bootp server
+no ip domain lookup
+ip domain name buzz.co.nz
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+crypto pki trustpoint TP-self-signed-4294967295
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-4294967295
+ revocation-check none
+ rsakeypair TP-self-signed-4294967295
+!
+!
+crypto pki certificate chain TP-self-signed-4294967295
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 34323934 39363732 3935301E 170D3139 30343038 30323432
+  30355A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D34 32393439
+  36373239 3530819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100A5DE E9ABBE7A 71429BA0 3B26A4AE 5E49C210 9D27D11B 42A5BB0E 8714C039
+  3CFA9E5A 859B6E43 A2190496 8EC8AFBD 6F7BA258 2E8A3B44 097D096C F7802953
+  209D5E82 FD481B1F C287F100 B42296A1 F3EB3D4D 5D9F441D 43147423 D0DB32D6
+  9E9E853F E5D8C46E E83058A7 4A8F1588 1AEFB044 ABFAA379 6B3534C5 18D8BFC8
+  06EF0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 14090F64 BFA78957 2A6D2F62 789F3DBB D5B6AA2A 87301D06
+  03551D0E 04160414 090F64BF A789572A 6D2F6278 9F3DBBD5 B6AA2A87 300D0609
+  2A864886 F70D0101 05050003 81810062 4C386179 994CC0C7 10150F13 E86401CB
+  A640061E FAB39271 4BC42862 44473921 227673E4 9A918D91 8F549CEB 523625A6
+  237C542D F8BFFBA3 CFC52CE8 59AC5C4A 7F42A673 59418FCD 23C2B48A 3B5A88E9
+  66389E63 F569BA2A B8637516 9D178358 7FDFA7E0 B6251128 2B8C95CE 192CA417
+  50A328B7 4E031AC2 A74541D9 C96FAB
+        quit
+username admin privilege 15 secret 9 $9$3CBI5KgiQN2L8b$z2ld.6HRKZsVx4hAiiLbAfvsPI.dCB5Fvv219JLwr.c
+!
+redundancy
+!
+no cdp log mismatch duplex
+no cdp run
+!
+ip tcp synwait-time 5
+!
+class-map type inspect match-any OUTSIDE-PROTOCOLS
+ match access-group name ALLOW-OUTSIDE-VPN-TRAFFIC
+ match protocol ssh
+class-map type inspect match-any VLAN2-PROTOCOLS
+ match protocol tcp
+ match protocol udp
+ match protocol icmp
+class-map type inspect match-any MANAGEMENT-PROTOCOLS
+ match protocol tcp
+ match protocol udp
+ match protocol icmp
+!
+policy-map type inspect VLAN2-TO-MANAGEMENT
+ class type inspect VLAN2-PROTOCOLS
+  inspect
+ class class-default
+  drop
+policy-map type inspect OUTSIDE-TO-VLAN2
+ class type inspect OUTSIDE-PROTOCOLS
+  inspect
+ class class-default
+  drop
+policy-map type inspect MANAGEMENT-TO-VLAN2
+ class type inspect MANAGEMENT-PROTOCOLS
+  inspect
+ class class-default
+  drop
+policy-map type inspect MANAGEMENT-TO-OUTSIDE
+ class type inspect MANAGEMENT-PROTOCOLS
+  inspect
+ class class-default
+  drop
+policy-map type inspect OUTSIDE-TO-MANAGEMENT
+ class type inspect OUTSIDE-PROTOCOLS
+  inspect
+ class class-default
+  drop
+policy-map type inspect VLAN2-TO-OUTSIDE
+ class type inspect VLAN2-PROTOCOLS
+  inspect
+ class class-default
+  drop
+!
+zone security SITE-2-VLAN2
+zone security SITE-2-MANAGEMENT
+zone security SITE-2-OUTSIDE
+zone-pair security VLAN2-TO-OUTSIDE source SITE-2-VLAN2 destination SITE-2-OUTSIDE
+ service-policy type inspect VLAN2-TO-OUTSIDE
+zone-pair security MANAGEMENT-TO-OUTSIDE source SITE-2-MANAGEMENT destination SITE-2-OUTSIDE
+ service-policy type inspect MANAGEMENT-TO-OUTSIDE
+zone-pair security OUTSIDE-TO-MANAGEMENT source SITE-2-OUTSIDE destination SITE-2-MANAGEMENT
+ service-policy type inspect OUTSIDE-TO-MANAGEMENT
+zone-pair security OUTSIDE-TO-VLAN2 source SITE-2-OUTSIDE destination SITE-2-VLAN2
+ service-policy type inspect OUTSIDE-TO-VLAN2
+zone-pair security MANAGEMENT-TO-VLAN2 source SITE-2-MANAGEMENT destination SITE-2-VLAN2
+ service-policy type inspect MANAGEMENT-TO-VLAN2
+zone-pair security VLAN2-TO-MANAGEMENT source SITE-2-VLAN2 destination SITE-2-MANAGEMENT
+ service-policy type inspect VLAN2-TO-MANAGEMENT
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes 256
+ authentication pre-share
+ group 2
+ lifetime 3600
+crypto isakmp key BuzzVPNKEY6016 address 204.150.175.2
+!
+!
+crypto ipsec transform-set TS-BUZZ-VPN esp-aes 256 esp-sha-hmac
+ mode tunnel
+!
+!
+!
+crypto map CMAP-BUZZ-VPN 10 ipsec-isakmp
+ set peer 204.150.175.2
+ set transform-set TS-BUZZ-VPN
+ match address VPN-TRAFFIC
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 192.168.0.30 255.255.255.255
+!
+interface GigabitEthernet0/0
+ ip address 130.10.1.206 255.255.255.252
+ no ip proxy-arp
+ zone-member security SITE-2-OUTSIDE
+ ip ospf message-digest-key 1 md5 7 123B100D083903113E222A2F65657345
+ duplex auto
+ speed auto
+ media-type rj45
+ no cdp enable
+ crypto map CMAP-BUZZ-VPN
+!
+interface GigabitEthernet0/1
+ no ip address
+ no ip proxy-arp
+ duplex auto
+ speed auto
+ media-type rj45
+ no cdp enable
+!
+interface GigabitEthernet0/1.2
+ encapsulation dot1Q 2
+ ip address 192.168.2.33 255.255.255.224
+ zone-member security SITE-2-VLAN2
+ no cdp enable
+!
+interface GigabitEthernet0/1.93
+ encapsulation dot1Q 93
+ ip address 192.168.2.1 255.255.255.224
+ zone-member security SITE-2-MANAGEMENT
+ no cdp enable
+!
+interface GigabitEthernet0/2
+ no ip address
+ no ip proxy-arp
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+ no cdp enable
+!
+interface GigabitEthernet0/3
+ no ip address
+ no ip proxy-arp
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+ no cdp enable
+!
+router ospf 1
+ area 1 authentication message-digest
+ area 2 authentication message-digest
+ passive-interface GigabitEthernet0/1
+ passive-interface GigabitEthernet0/1.2
+ passive-interface GigabitEthernet0/1.93
+ network 130.10.1.204 0.0.0.3 area 1
+ network 192.168.0.30 0.0.0.0 area 1
+ network 192.168.2.0 0.0.0.31 area 2
+ network 192.168.2.32 0.0.0.31 area 2
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+ip http secure-server
+ip tftp source-interface Loopback0
+ip route 0.0.0.0 0.0.0.0 130.10.1.205
+ip tacacs source-interface Loopback0
+ip ssh time-out 90
+ip ssh authentication-retries 5
+ip ssh version 2
+!
+ip access-list standard SNMP-ACCESS
+ permit 192.168.2.32 0.0.0.31
+!
+ip access-list extended ALLOW-OUTSIDE-VPN-TRAFFIC
+ permit ip 192.168.1.0 0.0.0.31 192.168.2.0 0.0.0.31
+ permit ip 192.168.1.32 0.0.0.31 192.168.2.0 0.0.0.31
+ permit ip 192.168.1.96 0.0.0.31 192.168.2.0 0.0.0.31
+ permit ip 192.168.1.128 0.0.0.31 192.168.2.0 0.0.0.31
+ permit ip 192.168.1.0 0.0.0.31 192.168.2.32 0.0.0.31
+ permit ip 192.168.1.32 0.0.0.31 192.168.2.32 0.0.0.31
+ permit ip 192.168.1.96 0.0.0.31 192.168.2.32 0.0.0.31
+ permit ip 192.168.1.128 0.0.0.31 192.168.2.32 0.0.0.31
+ permit ip 192.168.1.0 0.0.0.31 host 192.168.0.30
+ permit ip 192.168.1.32 0.0.0.31 host 192.168.0.30
+ permit ip 192.168.1.96 0.0.0.31 host 192.168.0.30
+ permit ip 192.168.1.128 0.0.0.31 host 192.168.0.30
+ permit ip host 204.150.175.2 192.168.2.0 0.0.0.31
+ permit ip host 204.150.175.2 192.168.2.32 0.0.0.31
+ip access-list extended ALLOWVTYACCESS
+ permit tcp 192.168.1.0 0.0.0.31 any eq 22
+ permit tcp 192.168.1.32 0.0.0.31 any eq 22
+ permit tcp 192.168.2.0 0.0.0.31 any eq 22
+ permit tcp host 130.10.1.202 any eq 22
+ permit tcp host 130.10.1.205 any eq 22
+ permit tcp host 192.168.0.20 any eq 22
+ip access-list extended VPN-TRAFFIC
+ permit ip 192.168.2.0 0.0.0.31 192.168.1.0 0.0.0.31
+ permit ip 192.168.2.0 0.0.0.31 192.168.1.32 0.0.0.31
+ permit ip 192.168.2.0 0.0.0.31 192.168.1.96 0.0.0.31
+ permit ip 192.168.2.0 0.0.0.31 192.168.1.128 0.0.0.31
+ permit ip 192.168.2.32 0.0.0.31 192.168.1.0 0.0.0.31
+ permit ip 192.168.2.32 0.0.0.31 192.168.1.32 0.0.0.31
+ permit ip 192.168.2.32 0.0.0.31 192.168.1.96 0.0.0.31
+ permit ip 192.168.2.32 0.0.0.31 192.168.1.128 0.0.0.31
+ permit ip host 192.168.0.30 192.168.1.0 0.0.0.31
+ permit ip host 192.168.0.30 192.168.1.32 0.0.0.31
+ permit ip host 192.168.0.30 192.168.1.64 0.0.0.31
+ permit ip host 192.168.0.30 192.168.1.96 0.0.0.31
+ permit ip host 192.168.0.30 192.168.1.128 0.0.0.31
+!
+logging source-interface GigabitEthernet0/1.2
+logging host 192.168.2.34
+!
+snmp-server group SNMP-BUZZ-GROUP v3 priv read SNMP-RO access SNMP-ACCESS
+snmp-server view SNMP-RO iso included
+snmp-server chassis-id
+snmp-server enable traps snmp authentication linkdown linkup coldstart
+snmp-server host 192.168.2.34 version 3 priv SNMP-Admin  snmp
+!
+tacacs server BuzzTACACS
+ address ipv4 192.168.1.98
+ key 7 123B100D083F2D270B08177E636474
+!
+!
+!
+control-plane
+!
+banner exec ^C UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+All activities performed on this device are logged and monitored. ^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+You must have explicit, authorized permission to access or configure this device.
+Unauthorized attempts and actions to access or use this system may result in civil and/or
+criminal penalties.
+All activities performed on this device are logged and monitored. ^C
+banner motd ^C UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+Unauthorized attempts and actions to access or use this system may result in civil and/or
+criminal penalties. ^C
+!
+line con 0
+ privilege level 15
+ password 7 0026061C1E78040859711D1848
+ logging synchronous
+ login authentication AAALIST
+line aux 0
+ privilege level 15
+ logging synchronous
+ login authentication AAALIST
+ no exec
+line vty 0 4
+ access-class ALLOWVTYACCESS in
+ password 7 123B100D081D181D7C7B757E72
+ login authentication AAALIST
+ transport input ssh
+!
+no scheduler allocate
+ntp authentication-key 6016 md5 0803595413373127 7
+ntp authenticate
+ntp trusted-key 6016
+ntp source Loopback0
+ntp update-calendar
+ntp server 192.168.0.20 key 6016 source GigabitEthernet0/0
+!
+end
