@@ -1,0 +1,592 @@
+ASA Version 9.9(2)
+!
+hostname ASABuzzNick
+domain-name buzz.co.nz
+enable password $sha512$5000$vwpFMF7n51iDb1Lto8Ck8Q==$xDd7N+mQZGG6V798ToFV5A== pbkdf2
+passwd PQn0pqTh86ZaEHQQ encrypted
+names
+
+!
+interface GigabitEthernet0/0
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet0/0.2
+ vlan 2
+ nameif OUTSIDE
+ security-level 0
+ ip address 204.150.175.2 255.255.255.248
+ ospf message-digest-key 1 md5 8 ul2vwrjKhjYm1wh3sfX22iH3LXkoNv71pMEHEsj3Iw==
+ ospf authentication message-digest
+!
+interface GigabitEthernet0/1
+ no nameif
+ no security-level
+ no ip address
+ ospf network point-to-point non-broadcast
+!
+interface GigabitEthernet0/1.3
+ vlan 3
+ nameif DMZ
+ security-level 70
+ ip address 192.168.1.65 255.255.255.224
+ ospf network point-to-point non-broadcast
+!
+interface GigabitEthernet0/1.92
+ vlan 92
+ nameif DMZ-MANAGEMENT-2
+ security-level 100
+ ip address 192.168.1.33 255.255.255.224
+ ospf network point-to-point non-broadcast
+!
+interface GigabitEthernet0/2
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet0/3
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet0/4
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet0/5
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet0/6
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface Management0/0
+ no nameif
+ security-level 100
+ no ip address
+ ospf network point-to-point non-broadcast
+!
+interface Management0/0.4
+ vlan 4
+ nameif INSIDE-VLAN-4
+ security-level 100
+ ip address 192.168.1.97 255.255.255.224
+ ospf network point-to-point non-broadcast
+!
+interface Management0/0.5
+ vlan 5
+ nameif INSIDE-VLAN-5
+ security-level 100
+ ip address 192.168.1.129 255.255.255.224
+ ospf network point-to-point non-broadcast
+!
+interface Management0/0.91
+ vlan 91
+ nameif INSIDE-MANAGEMENT-1
+ security-level 100
+ ip address 192.168.1.1 255.255.255.224
+ ospf network point-to-point non-broadcast
+!
+banner exec UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+banner exec All activities performed on this device are logged and monitored.
+banner login UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+banner login You must have explicit, authorized permission to access or configure this device.
+banner login Unauthorized attempts and actions to access or use this system may result in civil and/or
+banner login criminal penalties.
+banner login All activities performed on this device are logged and monitored.
+banner motd UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+banner motd Unauthorized attempts and actions to access or use this system may result in civil and/or
+banner motd criminal penalties.
+banner asdm UNAUTHORIZED ACCESS TO THIS GUI IS PROHIBITED
+banner asdm Unauthorized attempts and actions to access or configure this system may result in civil and/or
+banner asdm criminal penalties.
+ftp mode passive
+clock timezone NZST 12
+clock summer-time NZDT recurring last Sun Sep 2:00 1 Sun Apr 3:00
+dns server-group DefaultDNS
+ domain-name buzz.co.nz
+same-security-traffic permit inter-interface
+object network INSIDE-VLAN-4-SUBNET
+ subnet 192.168.1.96 255.255.255.224
+object network INSIDE-VLAN-5-SUBNET
+ subnet 192.168.1.128 255.255.255.224
+object network DMZ-SUBNET
+ subnet 192.168.1.64 255.255.255.224
+object network DMZ-MANAGEMENT-2-SUBNET
+ subnet 192.168.1.32 255.255.255.224
+object network INSIDE-MANAGEMENT-1-SUBNET
+ subnet 192.168.1.0 255.255.255.224
+object network DMZ-SERVER
+ host 192.168.1.66
+object network 192.168.2.0_27
+ subnet 192.168.2.0 255.255.255.224
+object network 192.168.2.32_27
+ subnet 192.168.2.32 255.255.255.224
+object network R3-LOOPBACK
+ host 192.168.0.30
+object network R3-OUTSIDE
+ host 130.10.1.206
+object-group network DM_INLINE_NETWORK_1
+ network-object object DMZ-MANAGEMENT-2-SUBNET
+ network-object object INSIDE-MANAGEMENT-1-SUBNET
+ network-object object INSIDE-VLAN-4-SUBNET
+ network-object object INSIDE-VLAN-5-SUBNET
+object-group network DM_INLINE_NETWORK_2
+ network-object object 192.168.2.0_27
+ network-object object 192.168.2.32_27
+ network-object object R3-LOOPBACK
+access-list OUTSIDE-IN-TRAFFIC extended permit tcp any host 192.168.1.66 eq www
+access-list OUTSIDE-IN-TRAFFIC extended permit tcp any host 192.168.1.66 eq https
+access-list OUTSIDE-IN-TRAFFIC extended permit tcp host 192.168.0.20 host 204.150.175.2 eq ssh
+access-list OUTSIDE-IN-TRAFFIC extended permit tcp host 130.10.1.202 host 204.150.175.2 eq ssh
+access-list OUTSIDE-IN-TRAFFIC extended permit tcp host 130.10.1.205 host 204.150.175.2 eq ssh
+access-list OUTSIDE-IN-TRAFFIC extended deny ip any any log
+access-list OUTSIDE_cryptomap extended permit ip object-group DM_INLINE_NETWORK_1 object-group DM_INLINE_NETWORK_2
+pager lines 23
+logging enable
+logging buffer-size 524288
+logging buffered errors
+logging trap notifications
+logging history notifications
+logging device-id context-name
+logging host OUTSIDE 192.168.2.34
+mtu OUTSIDE 1500
+mtu DMZ 1500
+mtu DMZ-MANAGEMENT-2 1500
+mtu INSIDE-VLAN-4 1500
+mtu INSIDE-VLAN-5 1500
+mtu INSIDE-MANAGEMENT-1 1500
+ip verify reverse-path interface OUTSIDE
+no failover
+no monitor-interface OUTSIDE
+no monitor-interface DMZ
+no monitor-interface DMZ-MANAGEMENT-2
+no monitor-interface INSIDE-VLAN-4
+no monitor-interface INSIDE-VLAN-5
+no monitor-interface INSIDE-MANAGEMENT-1
+no monitor-interface service-module
+icmp unreachable rate-limit 1 burst-size 1
+icmp permit 192.168.2.0 255.255.255.224 OUTSIDE
+icmp permit 192.168.2.32 255.255.255.224 OUTSIDE
+no asdm history enable
+arp timeout 14400
+no arp permit-nonconnected
+arp rate-limit 8192
+nat (any,OUTSIDE) source static DM_INLINE_NETWORK_1 DM_INLINE_NETWORK_1 destination static DM_INLINE_NETWORK_2 DM_INLINE_NETWORK_2 no-proxy-arp route-lookup
+!
+object network INSIDE-VLAN-4-SUBNET
+ nat (INSIDE-VLAN-4,OUTSIDE) dynamic interface
+object network INSIDE-VLAN-5-SUBNET
+ nat (INSIDE-VLAN-5,OUTSIDE) dynamic interface
+object network DMZ-SUBNET
+ nat (DMZ,OUTSIDE) dynamic interface
+object network DMZ-MANAGEMENT-2-SUBNET
+ nat (DMZ-MANAGEMENT-2,OUTSIDE) dynamic interface
+object network INSIDE-MANAGEMENT-1-SUBNET
+ nat (INSIDE-MANAGEMENT-1,OUTSIDE) dynamic interface
+object network DMZ-SERVER
+ nat (DMZ,OUTSIDE) static 204.150.175.3
+access-group OUTSIDE-IN-TRAFFIC in interface OUTSIDE
+router ospf 1
+ network 192.168.1.0 255.255.255.224 area 2
+ network 192.168.1.32 255.255.255.224 area 2
+ network 192.168.1.64 255.255.255.224 area 2
+ network 192.168.1.96 255.255.255.224 area 2
+ network 192.168.1.128 255.255.255.224 area 2
+ network 204.150.175.0 255.255.255.248 area 1
+ area 1 authentication message-digest
+ area 2 authentication message-digest
+ log-adj-changes
+!
+route OUTSIDE 0.0.0.0 0.0.0.0 204.150.175.1 1
+timeout xlate 3:00:00
+timeout pat-xlate 0:00:30
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 sctp 0:02:00 icmp 0:00:02
+timeout sunrpc 0:10:00 h323 0:05:00 h225 1:00:00 mgcp 0:05:00 mgcp-pat 0:05:00
+timeout sip 0:30:00 sip_media 0:02:00 sip-invite 0:03:00 sip-disconnect 0:02:00
+timeout sip-provisional-media 0:02:00 uauth 0:05:00 absolute
+timeout tcp-proxy-reassembly 0:01:00
+timeout floating-conn 0:00:00
+timeout conn-holddown 0:00:15
+timeout igp stale-route 0:01:10
+aaa-server BuzzTACACS protocol tacacs+
+aaa-server BuzzTACACS (INSIDE-VLAN-4) host 192.168.1.98
+ key 8 uyl6msO0uRncWtGQyirqbXXuIN7oq5/Nh69Ff1ij
+user-identity default-domain LOCAL
+aaa authentication serial console BuzzTACACS LOCAL
+aaa authentication ssh console BuzzTACACS LOCAL
+aaa authentication enable console BuzzTACACS LOCAL
+aaa authentication http console BuzzTACACS LOCAL
+aaa authorization command BuzzTACACS LOCAL
+aaa local authentication attempts max-fail 3
+aaa authorization exec authentication-server
+aaa authentication login-history
+http server enable
+http server session-timeout 5
+http 192.168.1.128 255.255.255.224 INSIDE-VLAN-5
+snmp-server group SNMP-BUZZ-GROUP v3 priv
+snmp-server user SNMP-Admin SNMP-BUZZ-GROUP v3 engineID 80000009fee42703eaeed44a988dd7cae7e63a6ccf81b387ca encrypted auth sha aa:a8:69:48:95:3a:04:f5:48:36:4a:ba:8a:d0:bc:cc:0c:36:3f:10 priv aes 256 98:a0:8b:d9:9a:d3:22:1d:1b:5a:00:44:03:c2:92:d4:2c:65:e3:80:a0:27:61:9d:36:42:ce:ff:9a:dc:48:cc
+snmp-server host-group OUTSIDE 192.168.2.32_27 poll version 3 SNMP-Admin
+no snmp-server location
+no snmp-server contact
+fragment chain 1 OUTSIDE
+sysopt noproxyarp OUTSIDE
+no service password-recovery
+crypto ipsec ikev1 transform-set ESP-AES-128-SHA esp-aes esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-128-MD5 esp-aes esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-192-SHA esp-aes-192 esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-192-MD5 esp-aes-192 esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-256-SHA esp-aes-256 esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-256-MD5 esp-aes-256 esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-128-SHA-TRANS esp-aes esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-128-SHA-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-AES-128-MD5-TRANS esp-aes esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-128-MD5-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-AES-192-SHA-TRANS esp-aes-192 esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-192-SHA-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-AES-192-MD5-TRANS esp-aes-192 esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-192-MD5-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-AES-256-SHA-TRANS esp-aes-256 esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-256-SHA-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-AES-256-MD5-TRANS esp-aes-256 esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-256-MD5-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-3DES-SHA esp-3des esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-3DES-MD5 esp-3des esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-3DES-SHA-TRANS esp-3des esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-3DES-SHA-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-3DES-MD5-TRANS esp-3des esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-3DES-MD5-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-DES-SHA esp-des esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-DES-MD5 esp-des esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-DES-SHA-TRANS esp-des esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-DES-SHA-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-DES-MD5-TRANS esp-des esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-DES-MD5-TRANS mode transport
+crypto ipsec ikev2 ipsec-proposal DES
+ protocol esp encryption des
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal 3DES
+ protocol esp encryption 3des
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal AES
+ protocol esp encryption aes
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal AES192
+ protocol esp encryption aes-192
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal AES256
+ protocol esp encryption aes-256
+ protocol esp integrity sha-1 md5
+crypto ipsec security-association pmtu-aging infinite
+crypto map OUTSIDE_map 1 match address OUTSIDE_cryptomap
+crypto map OUTSIDE_map 1 set peer 130.10.1.206
+crypto map OUTSIDE_map 1 set ikev1 transform-set ESP-AES-128-SHA ESP-AES-128-MD5 ESP-AES-192-SHA ESP-AES-192-MD5 ESP-AES-256-SHA ESP-AES-256-MD5 ESP-3DES-SHA ESP-3DES-MD5 ESP-DES-SHA ESP-DES-MD5
+crypto map OUTSIDE_map 1 set ikev2 ipsec-proposal AES256 AES192 AES 3DES DES
+crypto map OUTSIDE_map interface OUTSIDE
+crypto ca trustpoint _SmartCallHome_ServerCA
+ no validation-usage
+ crl configure
+crypto ca trustpoint ASDM_Launcher_Access_TrustPoint_0
+ enrollment self
+ fqdn none
+ subject-name CN=192.168.1.129,CN=ASABuzzNick
+ keypair ASDM_LAUNCHER
+ crl configure
+crypto ca trustpool policy
+ auto-import
+crypto ca certificate chain _SmartCallHome_ServerCA
+ certificate ca 513fb9743870b73440418d30930699ff
+    30820538 30820420 a0030201 02021051 3fb97438 70b73440 418d3093 0699ff30
+    0d06092a 864886f7 0d01010b 05003081 ca310b30 09060355 04061302 55533117
+    30150603 55040a13 0e566572 69536967 6e2c2049 6e632e31 1f301d06 0355040b
+    13165665 72695369 676e2054 72757374 204e6574 776f726b 313a3038 06035504
+    0b133128 63292032 30303620 56657269 5369676e 2c20496e 632e202d 20466f72
+    20617574 686f7269 7a656420 75736520 6f6e6c79 31453043 06035504 03133c56
+    65726953 69676e20 436c6173 73203320 5075626c 69632050 72696d61 72792043
+    65727469 66696361 74696f6e 20417574 686f7269 7479202d 20473530 1e170d31
+    33313033 31303030 3030305a 170d3233 31303330 32333539 35395a30 7e310b30
+    09060355 04061302 5553311d 301b0603 55040a13 1453796d 616e7465 6320436f
+    72706f72 6174696f 6e311f30 1d060355 040b1316 53796d61 6e746563 20547275
+    7374204e 6574776f 726b312f 302d0603 55040313 2653796d 616e7465 6320436c
+    61737320 33205365 63757265 20536572 76657220 4341202d 20473430 82012230
+    0d06092a 864886f7 0d010101 05000382 010f0030 82010a02 82010100 b2d805ca
+    1c742db5 175639c5 4a520996 e84bd80c f1689f9a 422862c3 a530537e 5511825b
+    037a0d2f e17904c9 b4967719 81019459 f9bcf77a 9927822d b783dd5a 277fb203
+    7a9c5325 e9481f46 4fc89d29 f8be7956 f6f7fdd9 3a68da8b 4b823341 12c3c83c
+    ccd6967a 84211a22 04032717 8b1c6861 930f0e51 80331db4 b5ceeb7e d062acee
+    b37b0174 ef6935eb cad53da9 ee9798ca 8daa440e 25994a15 96a4ce6d 02541f2a
+    6a26e206 3a6348ac b44cd175 9350ff13 2fd6dae1 c618f59f c9255df3 003ade26
+    4db42909 cd0f3d23 6f164a81 16fbf283 10c3b8d6 d855323d f1bd0fbd 8c52954a
+    16977a52 2163752f 16f9c466 bef5b509 d8ff2700 cd447c6f 4b3fb0f7 02030100
+    01a38201 63308201 5f301206 03551d13 0101ff04 08300601 01ff0201 00303006
+    03551d1f 04293027 3025a023 a021861f 68747470 3a2f2f73 312e7379 6d63622e
+    636f6d2f 70636133 2d67352e 63726c30 0e060355 1d0f0101 ff040403 02010630
+    2f06082b 06010505 07010104 23302130 1f06082b 06010505 07300186 13687474
+    703a2f2f 73322e73 796d6362 2e636f6d 306b0603 551d2004 64306230 60060a60
+    86480186 f8450107 36305230 2606082b 06010505 07020116 1a687474 703a2f2f
+    7777772e 73796d61 7574682e 636f6d2f 63707330 2806082b 06010505 07020230
+    1c1a1a68 7474703a 2f2f7777 772e7379 6d617574 682e636f 6d2f7270 61302906
+    03551d11 04223020 a41e301c 311a3018 06035504 03131153 796d616e 74656350
+    4b492d31 2d353334 301d0603 551d0e04 1604145f 60cf6190 55df8443 148a602a
+    b2f57af4 4318ef30 1f060355 1d230418 30168014 7fd365a7 c2ddecbb f03009f3
+    4339fa02 af333133 300d0609 2a864886 f70d0101 0b050003 82010100 5e945649
+    dd8e2d65 f5c13651 b603e3da 9e7319f2 1f59ab58 7e6c2605 2cfa81d7 5c231722
+    2c3793f7 86ec85e6 b0a3fd1f e232a845 6fe1d9fb b9afd270 a0324265 bf84fe16
+    2a8f3fc5 a6d6a393 7d43e974 21913528 f463e92e edf7f55c 7f4b9ab5 20e90abd
+    e045100c 14949a5d a5e34b91 e8249b46 4065f422 72cd99f8 8811f5f3 7fe63382
+    e6a8c57e fed008e2 25580871 68e6cda2 e614de4e 52242dfd e5791353 e75e2f2d
+    4d1b6d40 15522bf7 87897812 816ed94d aa2d78d4 c22c3d08 5f87919e 1f0eb0de
+    30526486 89aa9d66 9c0e760c 80f274d8 2af8b83a ced7d60f 11be6bab 14f5bd41
+    a0226389 f1ba0f6f 2963662d 3fac8c72 c5fbc7e4 d40ff23b 4f8c29c7
+  quit
+crypto ca certificate chain ASDM_Launcher_Access_TrustPoint_0
+ certificate 8eacaa5c
+    308202d8 308201c0 a0030201 0202048e acaa5c30 0d06092a 864886f7 0d01010b
+    0500302e 31143012 06035504 03130b41 53414275 7a7a4e69 636b3116 30140603
+    55040313 0d313932 2e313638 2e312e31 3239301e 170d3139 30343038 30323434
+    30395a17 0d323930 34303530 32343430 395a302e 31143012 06035504 03130b41
+    53414275 7a7a4e69 636b3116 30140603 55040313 0d313932 2e313638 2e312e31
+    32393082 0122300d 06092a86 4886f70d 01010105 00038201 0f003082 010a0282
+    010100a0 01dcd53f 7913c648 cef4c12b 4b582bc7 2e9b8551 ba73b2fd 1cdc6f9f
+    ce547701 90cebf39 82861e58 ed7b863c 8eba7065 63b0b1db 9ecf0bac 697f417b
+    9f729dab fbdc61d3 40738343 ddfb2e8a 7628a230 0b8f811a 075ea296 c24ef2f3
+    68ee3bbb bfc866b6 89fd8104 5b36ff60 6f27de6b 4ebe8462 d5a79835 22f2d607
+    78cdd90d 6d30fe13 afc70f67 b458000a ea437939 c70a210c b5232161 d18e20fe
+    04ec0a88 ef22e12e 3e4302cc daa869bd f64fcabe e556b690 f89b677b eba09c4e
+    c46ce32b 6ab956e2 41d1b4e1 a058a02e 4761bb44 c45438fb d0a84834 7035d323
+    bbfa40bf 2dcad0a7 e43d296b ce9a0f6f 11a96649 54f479fe 557646c2 fe186c43
+    95efc102 03010001 300d0609 2a864886 f70d0101 0b050003 82010100 826fd3a9
+    d8f868a2 61000256 67c0c58b e307800e 1533f392 6e86277d 813ad057 a8a51ed3
+    5d2dda68 8d70c303 84e5906e 974c33d2 daba4f95 7b58fc34 20c16c1d b6b00a74
+    964d1b77 e9f4cf9a ff756a70 d9d2d43b ab5b18a5 832ffd41 9815e04b dd6be828
+    46718ffe d4937479 89860aa4 8fbc3a16 029cff48 d00cdb64 19cecd89 6c5f8135
+    9847de18 3e457e66 aadcb622 30b5206e e88546ac 774f443f 74714b76 13d31e0e
+    792716e2 b3a738ac 5bab1ff3 5f5208d2 cc445965 2ff26356 30bc33f8 32f11b3f
+    718e9207 a33bd77b 7ad13a27 f9986a96 be61b5b1 853c338a 6402d060 23d1f44b
+    8f9689cd 87e60eda ac7a28ab 604c437f 368fbb15 96a7c62c b63d5a03
+  quit
+crypto ikev2 policy 1
+ encryption aes-256
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 10
+ encryption aes-192
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 20
+ encryption aes
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 30
+ encryption 3des
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 40
+ encryption des
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 enable OUTSIDE
+crypto ikev1 enable OUTSIDE
+crypto ikev1 policy 10
+ authentication pre-share
+ encryption aes-256
+ hash sha
+ group 2
+ lifetime 86400
+crypto ikev1 policy 20
+ authentication rsa-sig
+ encryption aes-256
+ hash sha
+ group 2
+ lifetime 86400
+crypto ikev1 policy 40
+ authentication pre-share
+ encryption aes-192
+ hash sha
+ group 2
+ lifetime 86400
+crypto ikev1 policy 50
+ authentication rsa-sig
+ encryption aes-192
+ hash sha
+ group 2
+ lifetime 86400
+crypto ikev1 policy 70
+ authentication pre-share
+ encryption aes
+ hash sha
+ group 2
+ lifetime 86400
+crypto ikev1 policy 80
+ authentication rsa-sig
+ encryption aes
+ hash sha
+ group 2
+ lifetime 86400
+crypto ikev1 policy 100
+ authentication pre-share
+ encryption 3des
+ hash sha
+ group 2
+ lifetime 86400
+crypto ikev1 policy 110
+ authentication rsa-sig
+ encryption 3des
+ hash sha
+ group 2
+ lifetime 86400
+crypto ikev1 policy 130
+ authentication pre-share
+ encryption des
+ hash sha
+ group 2
+ lifetime 86400
+crypto ikev1 policy 140
+ authentication rsa-sig
+ encryption des
+ hash sha
+ group 2
+ lifetime 86400
+telnet timeout 5
+ssh scopy enable
+ssh stricthostkeycheck
+ssh 192.168.0.20 255.255.255.255 OUTSIDE
+ssh 130.10.1.202 255.255.255.255 OUTSIDE
+ssh 130.10.1.205 255.255.255.255 OUTSIDE
+ssh 192.168.1.0 255.255.255.224 INSIDE-MANAGEMENT-1
+ssh timeout 5
+ssh version 2
+ssh key-exchange group dh-group1-sha1
+console timeout 5
+console serial
+dhcpd address 192.168.1.70-192.168.1.94 DMZ
+dhcpd enable DMZ
+!
+dhcpd address 192.168.1.134-192.168.1.158 INSIDE-VLAN-5
+dhcpd enable INSIDE-VLAN-5
+!
+threat-detection basic-threat
+threat-detection statistics access-list
+no threat-detection statistics tcp-intercept
+ntp authentication-key 6016 md5 8 PzVky5mDjGe1h/H5CJqAlcdLreZEKEk=
+ntp authenticate
+ntp trusted-key 6016
+ntp server 192.168.0.20 key 6016 source OUTSIDE
+ssl cipher tlsv1 custom "DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:AES256-SHA:AES128-SHA"
+ssl trust-point ASDM_Launcher_Access_TrustPoint_0 INSIDE-VLAN-5
+ssl trust-point ASDM_Launcher_Access_TrustPoint_0 INSIDE-VLAN-5 vpnlb-ip
+webvpn
+ enable OUTSIDE
+ cache
+  disable
+ error-recovery disable
+group-policy GroupPolicy_130.10.1.206 internal
+group-policy GroupPolicy_130.10.1.206 attributes
+ vpn-tunnel-protocol ikev1 ikev2
+group-policy Buzz-SSL-VPN-POLICY internal
+group-policy Buzz-SSL-VPN-POLICY attributes
+ vpn-tunnel-protocol ssl-clientless
+ webvpn
+  url-list value Web-Server
+dynamic-access-policy-record DfltAccessPolicy
+password-policy minimum-length 10
+password-policy minimum-changes 14
+password-policy minimum-lowercase 1
+password-policy minimum-uppercase 1
+password-policy minimum-numeric 1
+password-policy minimum-special 1
+password-policy lifetime 30
+username admin password $sha512$5000$6qQFLDsfsOioZNMFKBbNMA==$a+LS3zJj2qXaoGQEMLxBfg== pbkdf2 privilege 15
+username admin password-date Apr 8 2019
+username BuzzVPNuser password $sha512$5000$fMv3qfYV+H8N/UH4ZC7WOQ==$v7MxS9CbheJXRkgvt22POQ== pbkdf2 privilege 0
+username BuzzVPNuser password-date Apr 8 2019
+username BuzzVPNuser attributes
+ vpn-group-policy Buzz-SSL-VPN-POLICY
+tunnel-group 130.10.1.206 type ipsec-l2l
+tunnel-group 130.10.1.206 general-attributes
+ default-group-policy GroupPolicy_130.10.1.206
+tunnel-group 130.10.1.206 ipsec-attributes
+ ikev1 pre-shared-key 8 F7UGP9iRjNOMi2xWaFKFI5pCAJWXCh2G+EzzcKdC
+ ikev2 remote-authentication pre-shared-key 8 7GJ/dggJVcj8O+my/xvidtb0KVXaHZFsa70SuYld
+ ikev2 local-authentication pre-shared-key 8 N5aPGg8o5Yt285wEzxK0MuxlKpVWzw9cZcDwOBiT
+tunnel-group BuzzSSLVPN type remote-access
+tunnel-group BuzzSSLVPN general-attributes
+ default-group-policy Buzz-SSL-VPN-POLICY
+!
+class-map inspection_default
+ match default-inspection-traffic
+class-map DOS-SCAN
+ match any
+!
+!
+policy-map DOS-UNTRUSTED
+ class DOS-SCAN
+  set connection conn-max 65535 embryonic-conn-max 65535 per-client-max 65535 per-client-embryonic-max 65535
+policy-map type inspect dns migrated_dns_map_1
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+policy-map global_policy
+ class inspection_default
+  inspect dns migrated_dns_map_1
+  inspect ftp
+  inspect h323 h225
+  inspect h323 ras
+  inspect ip-options
+  inspect netbios
+  inspect rsh
+  inspect rtsp
+  inspect skinny
+  inspect esmtp
+  inspect sqlnet
+  inspect sunrpc
+  inspect tftp
+  inspect sip
+  inspect xdmcp
+policy-map type inspect dns migrated_dns_map_2
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+!
+service-policy global_policy global
+prompt hostname context
+no call-home reporting anonymous
+call-home
+ profile CiscoTAC-1
+  no active
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination address email callhome@cisco.com
+  destination transport-method http
+  subscribe-to-alert-group diagnostic
+  subscribe-to-alert-group environment
+  subscribe-to-alert-group inventory periodic monthly
+  subscribe-to-alert-group configuration periodic monthly
+  subscribe-to-alert-group telemetry periodic daily
+ profile License
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination transport-method http
+password encryption aes
+Cryptochecksum:9f202145f21d0151c6ea4c266727a5bc
+: end
