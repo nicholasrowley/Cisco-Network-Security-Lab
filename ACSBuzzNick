@@ -1,0 +1,51 @@
+hostname ACSBuzzNick
+!
+ip domain-name buzz.co.nz
+!
+ipv6 enable
+!
+tcp timeout 60
+no tcp recycle enable
+no tcp reuse enable
+!
+interface GigabitEthernet 0
+  ip address 192.168.1.98 255.255.255.224
+  ipv6 address autoconfig
+  ipv6 enable
+!
+interface GigabitEthernet 1
+  shutdown
+  ipv6 address autoconfig
+  ipv6 enable
+!
+ip name-server 8.8.8.8
+!
+ip default-gateway 192.168.1.97
+!
+!
+clock timezone NZ
+!
+ntp server 192.168.1.97
+!
+username admin password hash $5$E3YKLDs8$KlsIgr1vOq7KRK/Abedi6YbqLGhgGpAOL/xJpYB
+j/wC role admin
+!
+no max-ssh-sessions
+!
+service sshd enable
+!
+password-policy
+  lower-case-required
+  upper-case-required
+  digit-required
+  no-username
+  disable-cisco-passwords
+  min-password-length 6
+  password-lock-enabled
+  password-lock-retry-count 5
+!
+logging localhost
+logging loglevel 6
+!
+!
+icmp echo on
