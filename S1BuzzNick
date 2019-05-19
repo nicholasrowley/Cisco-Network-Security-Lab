@@ -1,0 +1,342 @@
+Current configuration : 8153 bytes
+!
+! Last configuration change at 18:17:20 NZST Mon Apr 8 2019 by BuzzAdmin1
+! NVRAM config last updated at 18:17:38 NZST Mon Apr 8 2019 by BuzzAdmin1
+!
+version 15.2
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime
+service timestamps log datetime msec
+service password-encryption
+service compress-config
+!
+hostname S1BuzzNick
+!
+boot-start-marker
+boot-end-marker
+!
+!
+logging buffered 524288 errors
+logging console critical
+enable secret 9 $9$9OOvvGvobBkGFI$U72RjYaHL/Bi6TKP0y86KR9gOy0fvcIWFQqlQEAS.OQ
+!
+username admin privilege 15 secret 9 $9$t/extqUPRiBh02$iGd.CoHkegDiSpNZSztzKottS8eFJx0BBTupapJNVHo
+aaa new-model
+!
+!
+aaa authentication login AAALIST group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone NZST 12 0
+clock summer-time NZDT recurring last Sun Sep 2:00 1 Sun Apr 3:00
+!
+!
+!
+!
+!
+no ip source-route
+no ip routing
+!
+!
+!
+no ip bootp server
+no ip domain-lookup
+ip domain-name buzz.co.nz
+no ip cef
+login on-failure log every 3
+no ipv6 cef
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+no cdp run
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ switchport access vlan 5
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky 000c.299a.e41c
+ switchport port-security
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet0/1
+ switchport trunk allowed vlan 4,5,91,100
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+ switchport nonegotiate
+ media-type rj45
+ negotiation auto
+!
+interface GigabitEthernet0/2
+ switchport access vlan 4
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky 000c.2976.8ea4
+ switchport port-security
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet0/3
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet1/0
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet1/1
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet1/2
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet1/3
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet2/0
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet2/1
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet2/2
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet2/3
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet3/0
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet3/1
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet3/2
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface GigabitEthernet3/3
+ switchport access vlan 404
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ shutdown
+ media-type rj45
+ negotiation auto
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+!
+interface Vlan91
+ ip address 192.168.1.2 255.255.255.224
+!
+ip default-gateway 192.168.1.1
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ip ssh time-out 90
+ip ssh authentication-retries 5
+ip ssh version 2
+!
+ip access-list standard SNMP-ACCESS
+ permit 192.168.2.32 0.0.0.31
+!
+ip access-list extended ALLOWVTYACCESS
+ permit tcp 192.168.1.0 0.0.0.31 any eq 22
+ permit tcp 192.168.1.32 0.0.0.31 any eq 22
+ permit tcp 192.168.2.0 0.0.0.31 any eq 22
+!
+logging source-interface GigabitEthernet0/1
+logging host 192.168.2.34
+!
+!
+snmp-server group SNMP-BUZZ-GROUP v3 priv read SNMP-RO access SNMP-ACCESS
+snmp-server view SNMP-RO iso included
+snmp-server enable traps snmp authentication linkdown linkup coldstart
+snmp-server host 192.168.2.34 version 3 priv SNMP-Admin  snmp
+tacacs server BuzzTACACS
+ address ipv4 192.168.1.98
+ key 7 08035954132D243433283F527A7A72
+!
+!
+!
+control-plane
+!
+banner exec ^C UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+All activities performed on this device are logged and monitored. ^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+You must have explicit, authorized permission to access or configure this device.
+Unauthorized attempts and actions to access or use this system may result in civil and/or
+criminal penalties.
+All activities performed on this device are logged and monitored. ^C
+banner motd ^C UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+Unauthorized attempts and actions to access or use this system may result in civil and/or
+criminal penalties. ^C
+!
+line con 0
+ password 7 03264E111C2C2E421859485356
+ logging synchronous
+ login authentication AAALIST
+line aux 0
+ no exec
+line vty 0 4
+ access-class ALLOWVTYACCESS in
+ password 7 0131131E411D1216771C1F5F58
+ login authentication AAALIST
+ transport input ssh
+!
+ntp authentication-key 6016 md5 0224114111283B11 7
+ntp authenticate
+ntp trusted-key 6016
+ntp update-calendar
+ntp server 192.168.0.30 key 6016 source GigabitEthernet0/0
+!
+end
